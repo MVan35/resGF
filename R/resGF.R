@@ -90,7 +90,7 @@ resGF <- function(obj,
     r_GF_tempmin  <- raster::raster()
     names(r_GF_tempmin)=i
     raster::extent(r_GF_tempmin) <- raster::extent(r)
-    raster:: dim(r_GF_tempmin) <- raster::dim(r)
+    dim(r_GF_tempmin) <- dim(r)
     raster::crs(r_GF_tempmin) <- raster_stack
     # myderivDF5$v2[myderivDF5$v2<0] <- 0 # change $y into $v2
     # stdvalues <- myderivDF5$v2 * gf$overall.imp[v] / GF_R_Total # method 1
@@ -174,7 +174,7 @@ resGF <- function(obj,
   single_r  <- raster::raster()
   names(single_r)='final_resistance'
   raster::extent(single_r) <- raster::extent(r)
-  raster::dim(single_r) <- raster::dim(r)
+  dim(single_r) <- dim(r)
   raster::values(single_r) <- myvector
   raster::crs(single_r) <- raster::crs(raster_stack)
   single_r <- climateStability::rescale0to1(single_r)
