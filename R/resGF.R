@@ -89,9 +89,9 @@ resGF <- function(obj,
     # Getting individual raster
     r_GF_tempmin  <- raster::raster()
     names(r_GF_tempmin)=i
-    extent(r_GF_tempmin) <- extent(r)
-    dim(r_GF_tempmin) <- dim(r)
-    crs(r_GF_tempmin) <- raster_stack
+    raster::extent(r_GF_tempmin) <- raster::extent(r)
+    raster:: dim(r_GF_tempmin) <- raster::dim(r)
+    raster::crs(r_GF_tempmin) <- raster_stack
     # myderivDF5$v2[myderivDF5$v2<0] <- 0 # change $y into $v2
     # stdvalues <- myderivDF5$v2 * gf$overall.imp[v] / GF_R_Total # method 1
     stdvalues <- myderivDF5$v2  # method 2
