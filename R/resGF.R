@@ -186,6 +186,36 @@ resGF <- function(obj,
 
 
 
+#' Return gradient forest importance
+#'
+#' This function generate a resistance surface based on gradient forest analysis.
+#'
+#' @param obj A GF object
+#' @param raster_stack A raster stack oject containing the same variable used in the GF analysis
+#' @return importance of the different variables
+#' @export
+get_importance <- function(obj, raster_stack) {
+  Env_pc <- 0
+  myimp <- NULL;
+  for (i in names(raster_stack)) {
+    importance.df <- obj$res[obj$res$var==i,] # me
+    # https://r-forge.r-project.org/scm/viewvc.php/pkg/gradientForest/R/whiten.R?view=markup&revision=2&root=gradientforest&pathrev=16
+    imp <- extendedForest::importance(obj)[i]
+    percent = round(imp / sum(extendedForest::importance(obj)) * 100, 2)
+    print(paste0(i,': ',percent,'%'))
+    myobj <- c(i, percent)
+    myimp <- rbind(myimp, myobj)
+    Env_pc <- Env_pc + percent
+  }
+  print(paste0('overall predicators: ',Env_pc,'%'))
+  myobj <- c('overall', Env_pc)
+  myimp <- rbind(myimp, myobj)
+  rownames(myimp) <- myimp[,1]
+  myimp <- as.data.frame(myimp)
+  myimp[,1] <- NULL
+  return(myimp)
+}
+
 ######################
 ### Other function
 ######################
@@ -274,36 +304,6 @@ integrate.density <- function(d) {
 }
 
 
-
-#' Generate resistance surface from GF analysis
-#'
-#' This function generate a resistance surface based on gradient forest analysis.
-#'
-#' @param obj A GF object
-#' @param raster_stack A raster stack oject containing the same variable used in the GF analysis
-#' @return importance of the different variables
-#' @export
-get_importance <- function(obj, raster_stack) {
-  Env_pc <- 0
-  myimp <- NULL;
-  for (i in names(raster_stack)) {
-    importance.df <- obj$res[obj$res$var==i,] # me
-    # https://r-forge.r-project.org/scm/viewvc.php/pkg/gradientForest/R/whiten.R?view=markup&revision=2&root=gradientforest&pathrev=16
-    imp <- extendedForest::importance(obj)[i]
-    percent = round(imp / sum(extendedForest::importance(obj)) * 100, 2)
-    print(paste0(i,': ',percent,'%'))
-    myobj <- c(i, percent)
-    myimp <- rbind(myimp, myobj)
-    Env_pc <- Env_pc + percent
-  }
-  print(paste0('overall predicators: ',Env_pc,'%'))
-  myobj <- c('overall', Env_pc)
-  myimp <- rbind(myimp, myobj)
-  rownames(myimp) <- myimp[,1]
-  myimp <- as.data.frame(myimp)
-  myimp[,1] <- NULL
-  return(myimp)
-}
 
 
 scale.density <- function(d,scale=1/mean(d$y)) {
