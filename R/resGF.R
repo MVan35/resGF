@@ -54,7 +54,7 @@ resGF <- function(obj,
     dStd <- dImp
     dStd$y <- dImp$y/dObs$y
     # dStdNorm <- tryCatch( { normalize.density(dStd,imp,integrate=T)}, error = function(e){dStdNorm <- dStd} )
-    dStdNorm <- try(normalize.density(dStd,imp,integrate=T)) # this sometimes does not converge
+    dStdNorm <- try(normalize.density(dStd,imp,integrate=T), silent=TRUE) # this sometimes does not converge, added the silence
     if (class(dStdNorm) == "try-error")
       dStdNorm <- normalize.histogram(dStd,imp)
 
@@ -295,4 +295,45 @@ is.binned <- function(obj) {
 }
 
 
+gf_importance <- function(obj) {
+  Env_pc <- 0
+  myimp <- NULL;
+  variable <- NULL;
+  for (i in names(obj$overall.imp) ) {
+    imp <- extendedForest::importance(obj)[i]
+    percent = round(imp / sum(extendedForest::importance(obj)) * 100, 2)
+    #print(paste0(i,': ',percent,'%'))
+    myimp <- rbind(myimp, percent)
+    variable <- rbind(variable, i)
+    Env_pc = Env_pc + imp
+  }
+  #print(paste0('overall predicators: ',Env_pc,'%'))
+  myimp <- rbind(myimp, Env_pc)
+  variable <- rbind(variable, 'overall predicators')
+  rownames(myimp) <- variable
+  colnames(myimp) <- "imp"
+  return(myimp)
+}
+
+get_imp <- function(obj, mystack) {
+  Env_pc <- 0
+  myimp <- NULL;
+  for (i in names(mystack)) {
+    importance.df <- obj$res[obj$res$var==i,] # me
+    # https://r-forge.r-project.org/scm/viewvc.php/pkg/gradientForest/R/whiten.R?view=markup&revision=2&root=gradientforest&pathrev=16
+    imp <- extendedForest::importance(obj)[i]
+    percent = round(imp / sum(extendedForest::importance(obj)) * 100, 2)
+    print(paste0(i,': ',percent,'%'))
+    myobj <- c(i, percent)
+    myimp <- rbind(myimp, myobj)
+    Env_pc <- Env_pc + percent
+  }
+  print(paste0('overall predicators: ',Env_pc,'%'))
+  myobj <- c('overall', Env_pc)
+  myimp <- rbind(myimp, myobj)
+  rownames(myimp) <- myimp[,1]
+  myimp <- as.data.frame(myimp)
+  myimp[,1] <- NULL
+  return(myimp)
+}
 
