@@ -315,7 +315,15 @@ gf_importance <- function(obj) {
   return(myimp)
 }
 
-get_imp <- function(obj, mystack) {
+#' Generate resistance surface from GF analysis
+#'
+#' This function generate a resistance surface based on gradient forest analysis.
+#'
+#' @param obj A GF object
+#' @param raster_stack A raster stack oject containing the same variable used in the GF analysis
+#' @return importance of the different variables
+#' @export
+get_importance <- function(obj, mystack) {
   Env_pc <- 0
   myimp <- NULL;
   for (i in names(mystack)) {
