@@ -122,12 +122,12 @@ resGF <- function(obj,
     if (save.image) {
       pdf(paste0(results_dir, variable_name)) # to get it save to file
       par(mfrow=c(2,3), oma=c(0,0,2,0))
-      plot(mycumu$x, mycumu$y, main= "Cummulative values")
-      lines(mycumu, col=2)
+      # plot(mycumu$x, mycumu$y, main= "Cummulative values")
+      # lines(mycumu, col=2)
       plot(gradientForest::cumimp(obj,i,standardize=FALSE),type='n',main="",ylab="Cum. importance",xlab=i)
       # lines(gradientForest::cumimp(gf,i),type='l',col="black")
       # lines(gradientforest::cumimp(gf,i,standardize_after=TRUE),type='l',col="blue")
-      lines(gradientforest::cumimp(obj,i,standardize=FALSE),type='l',col="black")
+      lines(gradientForest::cumimp(obj,i,standardize=FALSE),type='l',col="black")
       # legend(par("usr")[1],par("usr")[4],legend=c("Standardize then Normalize (default)",
       #                                             "Normalize then Standardize","Normalize only"),col=c("black","blue","red"),lty=1,cex=0.8)
       raster::plot(r, main= "original raster")
@@ -145,27 +145,23 @@ resGF <- function(obj,
     }
     # percent = round(gf$overall.imp[v] / GF_R_Total * 100, 2)
     percent = round(imp / sum(extendedForest::importance(obj)) * 100, 2)
-    percent2 = round(obj$overall.imp[i] / sum(obj$overall.imp) * 100, 2) # R2 weighted importance
     Env_pc <- Env_pc + percent
-    # Env_pc2 <- Env_pc2 + percent2
-    # par(mfrow=c(2,3), oma=c(0,0,2,0))
-    # # plot(mycumu$x, mycumu$y, main= "Cummulative values")
-    # # lines(mycumu, col=2)
-    # plot(gradientForest::cumimp(obj,i,standardize=FALSE),type='n',main="",ylab="Cum. importance",xlab=i)
-    # # lines(gradientForest::cumimp(gf,i),type='l',col="black")
-    # # lines(gradientForest::cumimp(gf,i,standardize_after=TRUE),type='l',col="blue")
-    # lines(gradientForest::cumimp(obj,i,standardize=FALSE),type='l',col="black")
-    # raster::plot(r, main= "original raster")
-    # hist(v1, breaks=50, col = 'grey', xlab = i, main = "intial values" ) # value of the initial raster ; main = paste("intial values for" , v)
-    # plot(ci, type='h', col="grey60", xlim=range(splits), lwd=barwidth,
-    #      ylim = c(0, max(dStdNorm2$y)*1.1), lend=2, xlab = i, ylab = "density")
-    # lines(dStdNorm2, col = "blue", lwd = 2)
-    # abline(h = mean(dStdNorm2$y)/mean(dStd2$y), lty = 2, col = "blue")
-    #
-    #
-    # raster::plot(r_GF_tempmin, main= "resistance surface")
-    # hist(myderivDF5$v2, breaks=50, col = 'grey', xlab = i,  main = "transformed values") # value of the initial raster
-    # mtext(paste0(i,': ',percent,'%'), line=0, side=3, outer=TRUE, cex=1.2)
+    par(mfrow=c(2,3), oma=c(0,0,2,0))
+    # plot(mycumu$x, mycumu$y, main= "Cummulative values")
+    # lines(mycumu, col=2)
+    plot(gradientForest::cumimp(obj,i,standardize=FALSE),type='n',main="",ylab="Cum. importance",xlab=i)
+    # lines(gradientForest::cumimp(gf,i),type='l',col="black")
+    # lines(gradientForest::cumimp(gf,i,standardize_after=TRUE),type='l',col="blue")
+    lines(gradientForest::cumimp(obj,i,standardize=FALSE),type='l',col="black")
+    raster::plot(r, main= "original raster")
+    hist(v1, breaks=50, col = 'grey', xlab = i, main = "intial values" ) # value of the initial raster ; main = paste("intial values for" , v)
+    plot(ci, type='h', col="grey60", xlim=range(splits), lwd=barwidth,
+         ylim = c(0, max(dStdNorm2$y)*1.1), lend=2, xlab = i, ylab = "density")
+    lines(dStdNorm2, col = "blue", lwd = 2)
+    abline(h = mean(dStdNorm2$y)/mean(dStd2$y), lty = 2, col = "blue")
+    raster::plot(r_GF_tempmin, main= "resistance surface")
+    hist(myderivDF5$v2, breaks=50, col = 'grey', xlab = i,  main = "transformed values") # value of the initial raster
+    mtext(paste0(i,': ',percent,'%'), line=0, side=3, outer=TRUE, cex=1.2)
     s <- raster::stack(s, r_GF_tempmin)
     print(paste0(i,': ',percent,'%'))
   }
