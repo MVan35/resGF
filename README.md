@@ -1,6 +1,8 @@
 # resGF
 
-By design, resGF has the ability to handle multiple environmental predicators to generate resistance surface.
+In a world subjected to increasing landscape fragmentation, we hope that this gradient forest approach and other machine learning techniques will prove useful to understand landscape connectivity. 
+
+By design, resGF has the ability to handle multiple environmental predicators to generate resistance surface. The gradient forest approach could be applied to wide range of genetic datasets including whole-genome, RAD-seq, microsatellite or even Genotyping-in-Thousands by sequencing (GT-seq) datasets. 
 
 # install
 ```R
