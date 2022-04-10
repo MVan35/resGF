@@ -29,7 +29,7 @@ Generate resistance surface using allellic frequencies and landscape variables.
 # get data
 library(raster)
 ## create a genind object
-geno <- read.table("genotypes5.txt", header = T, sep = '\t', row.names=1) # no tamar
+geno <- read.table("genotypes.txt", header = T, sep = '\t', row.names=1) # no tamar
 x <- pegas::as.loci(geno)
 x <-pegas::loci2genind(x, ploidy = 2, na.alleles = c("9"), unphase = TRUE)
 
