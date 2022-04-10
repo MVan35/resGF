@@ -29,6 +29,10 @@ Generate resistance surface using allellic frequencies and landscape variables.
 # get data
 library(raster)
 library(adegenet)
+
+mydir <- "."
+out_scenario <- paste0(mydir, "/analysis/")
+
 ## create a genind object
 geno <- read.table("genotypes.txt", header = T, sep = '\t', row.names=1) # no tamar
 x <- pegas::as.loci(geno)
@@ -83,5 +87,8 @@ snp <- as.data.frame(snp)
 # run gradient forest
 gf <- gradientForest(cbind(env.gf, snp), predictor.vars=colnames(env.gf), response.vars=colnames(snp), ntree=500, maxLevel=maxLevel, trace=T, corr.threshold=0.50)
 
+# create result directory
+GF_env_variables <- paste0(out_scenario, "/Gf_final/")
+dir.create(GF_env_variables, showWarnings = F)
 single_r <- resGF(gf, clipped_stack, save.image = T)
 ```
