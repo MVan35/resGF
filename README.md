@@ -24,11 +24,47 @@ Generate resistance surface using allellic frequencies and landscape variables.
 
 
 ```R
-## Gradient Forest
+# get data
+library(raster)
+## create a genind object
+geno <- read.table("genotypes5.txt", header = T, sep = '\t', row.names=1) # no tamar
+x <- pegas::as.loci(geno)
+x <-pegas::loci2genind(x, ploidy = 2, na.alleles = c("9"), unphase = TRUE)
+
+## obtain spatial data
+sample.coord  <-read.table("lat_lon.txt", header=T, stringsAsFactors=F, sep="\t", row.names=1) 
+sample.pop.sp <- SpatialPointsDataFrame(sample.coord[,c('Longitude','Latitude')], proj4string=CRS(crs.wgs), data=sample.coord)
+
+## Obtain some environmental data
+library(sdmpredictors)
+e <- c(-3, 16, 50, 60) # study area 
+environment.bottom <- load_layers( layercodes = c("BO_bathymean",
+                                                  "BO_calcite",
+                                                  "BO_ph",
+                                                  "BO_dissox",
+                                                  "BO_chlorange",
+                                                  "BO2_ironltmin_bdmax",
+                                                  "BO2_carbonphytomean_bdmean",
+                                                  "BO2_chlomax_bdmax",
+                                                  "BO2_curvelmean_ss",
+                                                  "BO2_curvelmean_bdmin"
+                                                  "MS_sss09_5m"), equalarea=FALSE, rasterstack=TRUE)
+environment.bottom.crop <- crop(environment.bottom, e, snap="out")
+# obtain a raster stack
+clipped_stack <- crop(environment.bottom.crop, e, snap="out")
+## create a resistance surface using resistantGF
+crs.wgs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+p <- as.data.frame(x$pop)
+names(p) <- 'Pop'
+colnames(sample.coord) <- c("y", "x")
+
+
+# Gradient Forest
 library(resGF)
 # extract points from
 clim.points <- raster::extract(clipped_stack, sample.coord.sp)
 #generates the PCNMs
+library(vegan)
 pcnm <- pcnm(dist(clim.points[,c('x', 'y')]))  
 keep <- round(length(which(pcnm$value > 0))/2)
 pcnm.keep <- scores(pcnm)[,1:keep]  #keep half of positive ones as suggested by some authors
@@ -41,7 +77,8 @@ maxLevel <- log2(0.368*nrow(env.gf)/2)
 env.gf <- as.data.frame(env.gf)
 snp <- as.data.frame(snp)
 
+# run gradient forest
 gf <- gradientForest(cbind(env.gf, snp), predictor.vars=colnames(env.gf), response.vars=colnames(snp), ntree=500, maxLevel=maxLevel, trace=T, corr.threshold=0.50)
 
-single_r <- resGF(gf_final, clipped_stack, save.image = T, GF_env_variables)
+single_r <- resGF(gf, clipped_stack, save.image = T)
 ```
