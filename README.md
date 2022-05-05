@@ -1,8 +1,6 @@
 # resGF
 
-In a world subjected to increasing landscape fragmentation, we hope that this gradient forest approach and other machine learning techniques will prove useful to understand landscape connectivity. 
-
-By design, resGF has the ability to handle multiple environmental predicators to generate resistance surface. The gradient forest approach could be applied to wide range of genetic datasets including whole-genome, RAD-seq, microsatellite or even Genotyping-in-Thousands by sequencing (GT-seq) datasets. 
+By design, resGF has the ability to handle multiple environmental predicators to generate resistance surface.
 
 # install
 ```R
@@ -28,11 +26,6 @@ Generate resistance surface using allellic frequencies and landscape variables.
 ```R
 # get data
 library(raster)
-library(adegenet)
-
-mydir <- "."
-out_scenario <- paste0(mydir, "/analysis/")
-
 ## create a genind object
 geno <- read.table("genotypes.txt", header = T, sep = '\t', row.names=1) # no tamar
 x <- pegas::as.loci(geno)
@@ -87,8 +80,5 @@ snp <- as.data.frame(snp)
 # run gradient forest
 gf <- gradientForest(cbind(env.gf, snp), predictor.vars=colnames(env.gf), response.vars=colnames(snp), ntree=500, maxLevel=maxLevel, trace=T, corr.threshold=0.50)
 
-# create result directory
-GF_env_variables <- paste0(out_scenario, "/Gf_final/")
-dir.create(GF_env_variables, showWarnings = F)
 single_r <- resGF(gf, clipped_stack, save.image = T)
 ```

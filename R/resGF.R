@@ -17,7 +17,7 @@
 resGF <- function(obj,
                   raster_stack,
                   save.image = TRUE,
-                  results_dir) {
+                  results_dir = FALSE) {
   #GF_R_Total <- GF_total_importance(obj) # simplify this?
   mylength <- raster::ncell(raster_stack[[1]])
   myvector <- vector(mode="numeric", length=mylength)
