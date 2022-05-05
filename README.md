@@ -24,8 +24,12 @@ Generate resistance surface using allellic frequencies and landscape variables.
 
 
 ```R
-# get data
-setwd("~/Desktop/SAMARCH/Paper1/submission/Bekkevold_2021/data")
+# get data - (https://github.com/MVan35/resGF_method_paper)
+"""
+Using data obtain from the following study:
+Bekkevold, D., Piper, A., Campbell, R., Rippon, P., Wright, R. M., Crundwell, C., ... & Maltby, A. (2021). Genetic stock identification of sea trout (Salmo trutta L.) along the British North Sea Coast shows prevalent long-distance migration. ICES Journal of Marine Science, 78(3), 952-966.
+"""
+
 library(raster)
 ## create a genind object
 geno <- read.table("genotypes.txt", header = T, sep = '\t', row.names=1) # no tamar
@@ -53,7 +57,7 @@ e <- c(-3, 16, 50, 60) # study area
 #                                                  "BO2_curvelmean_ss",
 #                                                  "BO2_curvelmean_bdmin"
 #                                                  "MS_sss09_5m"), equalarea=FALSE, rasterstack=TRUE)
-# load tif files
+# or - load tif filesdirectly
 BO_bathymean <- raster("BO_bathymean_lonlat.tif")
 BO_calcite <- raster("BO_calcite_lonlat.tif")
 BO_chlorange <- raster("BO_chlorange.tif")
