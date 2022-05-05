@@ -25,6 +25,7 @@ Generate resistance surface using allellic frequencies and landscape variables.
 
 ```R
 # get data
+setwd("~/Desktop/SAMARCH/Paper1/submission/Bekkevold_2021/data")
 library(raster)
 ## create a genind object
 geno <- read.table("genotypes.txt", header = T, sep = '\t', row.names=1) # no tamar
@@ -32,53 +33,59 @@ x <- pegas::as.loci(geno)
 x <-pegas::loci2genind(x, ploidy = 2, na.alleles = c("9"), unphase = TRUE)
 
 ## obtain spatial data
-sample.coord  <-read.table("lat_lon.txt", header=T, stringsAsFactors=F, sep="\t", row.names=1) 
-sample.pop.sp <- SpatialPointsDataFrame(sample.coord[,c('Longitude','Latitude')], proj4string=CRS(crs.wgs), data=sample.coord)
+sample.coord  <-read.table("lat_lon.txt", header=T, stringsAsFactors=F, sep="\t", row.names=1)
+colnames(sample.coord) <- c("x", "y")
+sample.coord.sp <- SpatialPointsDataFrame(sample.coord[,c('y','x')], proj4string=CRS(crs.wgs), data=sample.coord)
 
 ## Obtain some environmental data
 library(sdmpredictors)
-e <- c(-3, 16, 50, 60) # study area 
-environment.bottom <- load_layers( layercodes = c("BO_bathymean",
-                                                  "BO_calcite",
-                                                  "BO_ph",
-                                                  "BO_dissox",
-                                                  "BO_chlorange",
-                                                  "BO2_ironltmin_bdmax",
-                                                  "BO2_carbonphytomean_bdmean",
-                                                  "BO2_chlomax_bdmax",
-                                                  "BO2_curvelmean_ss",
-                                                  "BO2_curvelmean_bdmin"
-                                                  "MS_sss09_5m"), equalarea=FALSE, rasterstack=TRUE)
+e <- c(-3, 16, 50, 60) # study area
+
+# load layers using sdmpredictors
+#environment.bottom <- load_layers( layercodes = c("BO_bathymean",
+#                                                  "BO_calcite",
+#                                                  "BO_ph",
+#                                                  "BO_dissox",
+#                                                  "BO_chlorange",
+#                                                  "BO2_ironltmin_bdmax",
+#                                                  "BO2_carbonphytomean_bdmean",
+#                                                  "BO2_chlomax_bdmax",
+#                                                  "BO2_curvelmean_ss",
+#                                                  "BO2_curvelmean_bdmin"
+#                                                  "MS_sss09_5m"), equalarea=FALSE, rasterstack=TRUE)
+# load tif files
+BO_bathymean <- raster("BO_bathymean_lonlat.tif")
+BO_calcite <- raster("BO_calcite_lonlat.tif")
+BO_chlorange <- raster("BO_chlorange.tif")
+BO_dissox <- raster("BO_dissox_lonlat.tif")
+BO_ph <- raster("BO_ph_lonlat.tif")
+environment.bottom <- stack(BO_bathymean, BO_calcite, BO_chlorange, BO_dissox, BO_ph)
+
 environment.bottom.crop <- crop(environment.bottom, e, snap="out")
 # obtain a raster stack
 clipped_stack <- crop(environment.bottom.crop, e, snap="out")
 ## create a resistance surface using resistantGF
 crs.wgs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-p <- as.data.frame(x$pop)
-names(p) <- 'Pop'
-colnames(sample.coord) <- c("y", "x")
-
 
 # Gradient Forest
-library(resGF)
+library(gradientForest)
 # extract points from
 clim.points <- raster::extract(clipped_stack, sample.coord.sp)
 #generates the PCNMs
 library(vegan)
-pcnm <- pcnm(dist(clim.points[,c('x', 'y')]))  
+pcnm <- pcnm(dist(sample.coord.sp@data))
 keep <- round(length(which(pcnm$value > 0))/2)
 pcnm.keep <- scores(pcnm)[,1:keep]  #keep half of positive ones as suggested by some authors
-clim.points <- cbind(p2, clim.points)
 
 nbvar <- length(colnames(clim.points))
-env.gf <- cbind(clim.points[ , c(seq(3, nbvar, by=1)) ], pcnm.keep)
-library(gradientForest)
+env.gf <- cbind(clim.points[ , c(seq(1, nbvar, by=1)) ], pcnm.keep)
 maxLevel <- log2(0.368*nrow(env.gf)/2)
 env.gf <- as.data.frame(env.gf)
-snp <- as.data.frame(snp)
+snp <- as.data.frame(x$tab)
 
 # run gradient forest
 gf <- gradientForest(cbind(env.gf, snp), predictor.vars=colnames(env.gf), response.vars=colnames(snp), ntree=500, maxLevel=maxLevel, trace=T, corr.threshold=0.50)
-
+# generate resistance surface
 single_r <- resGF(gf, clipped_stack, save.image = T)
+
 ```
