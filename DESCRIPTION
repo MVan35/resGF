@@ -17,7 +17,6 @@ RoxygenNote: 7.1.2
 Imports:
         extendedForest,
         gradientForest,
-        climateStability,
         roperators,
         raster
 Suggests: 

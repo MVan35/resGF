@@ -173,7 +173,7 @@ resGF <- function(obj,
   dim(single_r) <- dim(r)
   raster::values(single_r) <- myvector
   raster::crs(single_r) <- raster::crs(raster_stack)
-  single_r <- climateStability::rescale0to1(single_r)
+  single_r <- rescale_0to1(single_r)
   # raster::plot(single_r)
   print(paste0('overall predicators: ',Env_pc,'%'))
   print(paste0('positive snp: ', obj$species.pos.rsq))
@@ -300,6 +300,16 @@ integrate.density <- function(d) {
 }
 
 
+rescale_0to1 <- function (rasterForCalculation)
+{
+  if (class(rasterForCalculation) != "RasterLayer") {
+    warning("Supplied argument is not a raster./n", sep = "")
+    return(NULL)
+  }
+  rescaledRaster <- (rasterForCalculation - rasterForCalculation@data@min)/(rasterForCalculation@data@max -
+                                                                              rasterForCalculation@data@min)
+  return(rescaledRaster)
+}
 
 
 scale.density <- function(d,scale=1/mean(d$y)) {
